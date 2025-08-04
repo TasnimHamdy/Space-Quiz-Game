@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌌 Space Quiz Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Arial", sans-serif;
+      background: black;
+      color: white;
+      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      padding: 10px;
+    }
+    .sky {
+      position: relative;
+      width: 100%;
+      height: 80vh;
+      background: radial-gradient(circle at center, #000010, #000000);
+      overflow: hidden;
+    }
+    .tiny-star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      box-shadow: 0 0 6px white;
+    }
+    .star {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: lightblue;
+      border-radius: 50%;
+      box-shadow: 0 0 15px cyan, 0 0 25px blue;
+      cursor: pointer;
+      display: none;
+      transition: transform 0.3s;
+    }
+    .star:hover {
+      transform: scale(1.3);
+    }
+
+    /* Popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #444;
+      text-align: center;
+      width: 320px;
+      color: white;
+    }
+    .popup h2 {
+      margin-bottom: 15px;
+    }
+    .popup input {
+      padding: 8px;
+      width: 90%;
+      margin-bottom: 10px;
+    }
+    .popup button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .ok-btn { background: green; color: white; }
+    .close-btn { background: red; color: white; }
+  </style>
+</head>
+<body>
+  <h1>🌌 Space Quiz Game</h1>
+  <div class="sky" id="sky">
+    <!-- Question Stars -->
+    <div class="star" id="star1" style="top:80px; left:120px;"></div>
+    <div class="star" id="star2" style="top:200px; left:300px;"></div>
+    <div class="star" id="star3" style="top:350px; left:500px;"></div>
+  </div>
+
+  <!-- Question Popup -->
+  <div id="popup-question" class="popup">
+    <h2 id="question"></h2>
+    <input type="text" id="answer" placeholder="Type your answer here">
+    <br>
+    <button class="ok-btn" onclick="checkAnswer()">Submit</button>
+    <button class="close-btn" onclick="closePopup('popup-question')">Close</button>
+  </div>
+
+  <!-- Tip Popup -->
+  <div id="popup-tip" class="popup">
+    <h2>💡 Tip</h2>
+    <p id="tip-text"></p>
+    <button class="ok-btn" onclick="closeTip()">OK</button>
+  </div>
+
+  <script>
+    // Add random tiny stars for realistic sky
+    const sky = document.getElementById("sky");
+    for (let i = 0; i < 100; i++) {
+      let tiny = document.createElement("div");
+      tiny.className = "tiny-star";
+      tiny.style.top = Math.random() * 100 + "%";
+      tiny.style.left = Math.random() * 100 + "%";
+      sky.appendChild(tiny);
+    }
+
+    const questions = [
+      {q: "What is the closest planet to the Sun?", a: "Mercury", tip: "Mercury is small but extremely hot during the day."},
+      {q: "Which planet is known as the Red Planet?", a: "Mars", tip: "Mars is called the Red Planet because of its iron oxide dust."},
+      {q: "What is the largest planet in our solar system?", a: "Jupiter", tip: "Jupiter is so big it could fit all other planets inside it!"}
+    ];
+
+    let current = 0;
+
+    // Show first star
+    document.getElementById("star1").style.display = "block";
+
+    // Add click events to stars
+    document.querySelectorAll(".star").forEach((star, index) => {
+      star.addEventListener("click", () => {
+        current = index;
+        document.getElementById("question").innerText = questions[index].q;
+        document.getElementById("answer").value = "";
+        document.getElementById("popup-question").style.display = "block";
+      });
+    });
+
+    function checkAnswer() {
+      let answer = document.getElementById("answer").value.trim();
+      if(answer.toLowerCase() === questions[current].a.toLowerCase()) {
+        document.querySelector(`#star${current+1}`).style.background = "green";
+        document.getElementById("popup-question").style.display = "none";
+
+        // Show tip popup
+        document.getElementById("tip-text").innerText = questions[current].tip;
+        document.getElementById("popup-tip").style.display = "block";
+
+      } else {
+        alert("❌ Wrong Answer. Game Over!");
+        document.getElementById("popup-question").style.display = "none";
+      }
+    }
+
+    function closePopup(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    function closeTip() {
+      document.getElementById("popup-tip").style.display = "none";
+
+      if(document.getElementById(`star${current+2}`)) {
+        document.getElementById(`star${current+2}`).style.display = "block";
+      } else {
+        alert("🎉 Congratulations! You finished all the questions!");
+      }
+    }
+  </script>
+</body>
+</html>

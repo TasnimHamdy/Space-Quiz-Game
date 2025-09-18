@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Space Quiz Journey</title>
+<style>
+body{margin:0;color:#fff;font-family:Arial, sans-serif;overflow:hidden;background:#000}
+header{padding:14px;text-align:center;background:rgba(0,0,0,0.5);position:relative;z-index:10}
+/* Home */
+.home{display:flex;align-items:center;justify-content:center;height:100vh;position:relative;z-index:5}
+.orbit-system{position:relative;width:600px;height:600px}
+.sun{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#ffcc00,#ff6600);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.planet{width:80px;height:80px;border-radius:50%;position:absolute;cursor:pointer;overflow:hidden;box-shadow:0 0 15px rgba(255,255,255,0.5);z-index:2}
+.planet img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.planet.locked{filter:grayscale(100%) brightness(0.4);cursor:not-allowed}
+.planet-label{position:absolute;width:100%;text-align:center;font-size:12px;top:85px;left:0;color:#fff;z-index:3}
+/* Levels */
+.level{position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:#fff;z-index:5}
+.stars{position:relative;width:100%;height:100%;z-index:2}
+/* Canvas */
+#homeCanvas {position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
+canvas.star-bg {position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
+/* Question stars */
+@keyframes twinkle {0%,100% {opacity:1; transform:scale(1);}50% {opacity:0.5; transform:scale(1.2);}}
+.star-question{position:absolute;width:100px;height:100px;background: radial-gradient(circle, #fff, #ddd 30%, transparent 70%);clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);box-shadow:0 0 20px #fff, 0 0 40px #fff;cursor:pointer;animation: twinkle 2s infinite;opacity:0;transition:opacity 0.3s;}
+/* Popup */
+.popup{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#111;padding:24px;border-radius:12px;display:none;color:#fff;z-index:20;max-width:500px;min-width:300px;}
+.popup h2{margin-bottom:15px;}
+.option-btn{display:block;width:100%;margin:6px 0;padding:8px;border-radius:6px;background:#222;color:#fff;border:1px solid #555;cursor:pointer;text-align:left;}
+.option-btn:hover{background:#0af;color:#000;}
+.btn{padding:6px 12px;margin:5px;cursor:pointer;border-radius:6px}
+.btn-primary{background:#0af;color:#000}
+.btn-ghost{background:transparent;border:1px solid #555;color:#fff}
+
+/* Congrats Popup */
+#congratsPopup {
+  display: none;
+  width: 600px;
+  max-width: 95%;
+  background: linear-gradient(135deg, #121212, #070707);
+  color: rgb(244, 240, 240);
+  padding: 60px;
+  border-radius: 30px;
+  text-align: center;
+  font-size: 24px;
+  z-index: 9999;
+  box-shadow: 0 0 40px rgba(255,255,255,0.9);
+  animation: popupZoom 0.6s ease;
+}
+#congratsPopup h2 {
+  font-size: 42px;
+  margin-bottom: 20px;
+}
+#congratsPopup p {
+  font-size: 26px;
+  margin: 15px 0;
+}
+@keyframes popupZoom {
+  from { transform: translate(-50%,-50%) scale(0.5); opacity: 0; }
+  to   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  background-color: hsl(var(--hue), 90%, 60%);
+  top: -10px;
+  border-radius: 50%;
+  animation: fall 3s linear forwards;
+  z-index: 99999;
+}
+@keyframes fall {
+  to { transform: translateY(100vh) rotate(720deg); }
+}
+
+/* Level Score Popup */
+#levelScorePopup {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 20px;
+  box-shadow: 0 0 25px rgba(255,255,255,0.6);
+  max-width: 400px;
+}
+#levelScorePopup h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+#levelScorePopup p {
+  margin: 10px 0;
+  font-size: 18px;
+}
+</style>
+</head>
+<body>
+<header><h1>🌌 Space Quiz Journey</h1></header>
+
+<section class="home" id="home">
+  <canvas id="homeCanvas"></canvas>
+  <div class="orbit-system" id="orbitSystem">
+    <div class="sun"></div>
+  </div>
+</section>
+
+<section class="level" id="levelView">
+  <canvas class="star-bg" id="levelCanvas"></canvas>
+  <div class="stars" id="stars"></div>
+</section>
+
+<div class="popup" id="qPopup">
+  <h2 id="qText"></h2>
+  <div id="options"></div>
+  <div><button class="btn btn-ghost" onclick="closeQ()">Cancel</button></div>
+</div>
+
+<div class="popup" id="infoPopup">
+  <h2 id="infoTitle"></h2>
+  <p id="infoBody"></p>
+  <div><button class="btn btn-primary" onclick="closeInfo()">OK</button></div>
+</div>
+
+<div class="popup" id="congratsPopup">
+  <h2>🎉✨ Congratulations! 🚀🌟</h2>
+  <p id="finalScore"></p>
+  <p>🎊 You’ve completed the journey across the planets! 🎊</p>
+  <div><button class="btn" onclick="closeCongrats()">Continue</button></div>
+</div>
+
+<!-- Level Score Popup -->
+<div class="popup" id="levelScorePopup">
+  <h2>Level Completed 🎯</h2>
+  <p id="levelScoreText"></p>
+  <div><button class="btn btn-primary" onclick="closeLevelScore()">Continue</button></div>
+</div>
+
+<script>
+/* الكواكب */
+const planets=[
+ {id:"Mercury",img:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg",levelIndex:0},
+ {id:"Mars",img:"https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg",levelIndex:1},
+ {id:"Saturn",img:"https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg",levelIndex:2},
+ {id:"Uranus",img:"https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg",levelIndex:3},
+ {id:"Neptune",img:"https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg",levelIndex:4}
+];
+let unlocked=0;
+const orbitSystem=document.getElementById("orbitSystem");
+const positions=[
+  {top:"10%",left:"50%"},
+  {top:"50%",left:"90%"},
+  {top:"90%",left:"50%"},
+  {top:"50%",left:"10%"},
+  {top:"20%",left:"20%"}
+];
+planets.forEach((p,i)=>{
+  let planet=document.createElement("div");
+  planet.className="planet";
+  if(i>unlocked) planet.classList.add("locked");
+  planet.style.top=positions[i].top;
+  planet.style.left=positions[i].left;
+  let img=document.createElement("img");
+  img.src=p.img;
+  planet.appendChild(img);
+  planet.innerHTML+=`<div class="planet-label">${p.id}</div>`;
+  planet.onclick=()=>{ if(i===unlocked) openLevel(p.levelIndex,i); };
+  orbitSystem.appendChild(planet);
+});
+
+/* Confetti */
+function launchConfetti(){
+  for(let i=0;i<120;i++){
+    const confetti=document.createElement("div");
+    confetti.className="confetti";
+    confetti.style.left=Math.random()*100+"vw";
+    confetti.style.setProperty("--hue", Math.floor(Math.random()*360));
+    confetti.style.animationDuration=(Math.random()*3+2)+"s";
+    confetti.style.width=(Math.random()*8+6)+"px";
+    confetti.style.height=(Math.random()*8+6)+"px";
+    confetti.style.borderRadius=Math.random()>0.5?"50%":"0";
+    document.body.appendChild(confetti);
+    setTimeout(()=>confetti.remove(),4000);
+  }
+}
+
+/* الأسئلة */
+const allQuestions=[
+  {q:"When will the global hackathon be held?", a:"4 - 5 October", note:"(4 - 5 October)", options:["3 - 4 October","4 - 5 October","5 - 6 October","6 - 7 October"]},
+  {q:"Does the hackathon require technical background?", a:"no", note:"(can join team with tech background)", options:["yes","no","maybe","depends"]},
+  {q:"What's the difference between virtual and on-site?", a:"there's no difference", note:"(ordinary stuff)", options:["virtual is easier","on-site better","there's no difference","on-site is harder"]},
+  {q:"Can I have a one-man team?", a:"yes", note:"(advised to join team)", options:["yes","no","maybe","depends"]},
+  {q:"How many challenges for 2025?", a:"18 challenges", note:"(18 challenges)", options:["10 challenges","15 challenges","18 challenges","20 challenges"]},
+  {q:"Are judging criteria public?", a:"yes", note:"(link participants guide)", options:["yes","no","not sure","internal only"]},
+  {q:"Where find challenge details?", a:"on NASA space apps website", note:"(link provided)", options:["on NASA space apps website","hackathon app","email","not available"]},
+  {q:"How ask mentor's help?", a:"using discord", note:"(temp answer)", options:["via email","using discord","call mentor","not possible"]},
+  {q:"Is there a deadline?", a:"yes", note:"(to be announced)", options:["no","yes","maybe","team leaders only"]},
+  {q:"Any rules for presentation?", a:"yes", note:"(based on judging)", options:["yes","no","maybe","depends"]},
+  {q:"Is there a closing ceremony?", a:"yes", note:"(date by team)", options:["yes","no","maybe","not decided"]},
+  {q:"Maximum team members?", a:"6 members", note:"(6 members)", options:["4 members","5 members","6 members","7 members"]}
+];
+
+const levels=[
+  {name:"Mercury",bgColor:"#2e2e2e",questions:allQuestions.slice(0,3)},
+  {name:"Mars",bgColor:"#4d0000",questions:allQuestions.slice(3,5)},
+  {name:"Saturn",bgColor:"#4d3300",questions:allQuestions.slice(5,7)},
+  {name:"Uranus",bgColor:"#00334d",questions:allQuestions.slice(7,9)},
+  {name:"Neptune",bgColor:"#00004d",questions:allQuestions.slice(9,12)}
+];
+
+let activeLevel,activePlanetIndex,activeQ;
+let totalScore=0;
+let levelScore=0;
+
+const home=document.getElementById("home");
+const levelView=document.getElementById("levelView");
+const starsDiv=document.getElementById("stars");
+const qPopup=document.getElementById("qPopup"),qText=document.getElementById("qText"),optionsDiv=document.getElementById("options");
+const infoPopup=document.getElementById("infoPopup"),infoTitle=document.getElementById("infoTitle"),infoBody=document.getElementById("infoBody");
+
+/* نجوم الصفحة الرئيسية */
+const homeCanvas=document.getElementById("homeCanvas");
+const hctx=homeCanvas.getContext("2d");
+function resizeHomeCanvas(){homeCanvas.width=window.innerWidth; homeCanvas.height=window.innerHeight;}
+resizeHomeCanvas(); window.addEventListener("resize", resizeHomeCanvas);
+let hstars=[];
+function createHomeStars(count){hstars=[];for(let i=0;i<count;i++){hstars.push({x:Math.random()*homeCanvas.width,y:Math.random()*homeCanvas.height,r:Math.random()*2+0.5,o:Math.random(),d:Math.random()*0.03+0.01});}}
+createHomeStars(300);
+function drawHomeStars(){hctx.clearRect(0,0,homeCanvas.width,homeCanvas.height);hstars.forEach(s=>{hctx.globalAlpha=s.o;hctx.shadowBlur=12;hctx.shadowColor="white";hctx.fillStyle="white";hctx.beginPath();hctx.arc(s.x,s.y,s.r,0,2*Math.PI);hctx.fill();s.o+=s.d;if(s.o>1||s.o<0){s.d*=-1;}});hctx.shadowBlur=0;requestAnimationFrame(drawHomeStars);}
+drawHomeStars();
+
+/* نجوم الخلفية في الليفلات */
+const levelCanvas=document.getElementById("levelCanvas");
+const lctx=levelCanvas.getContext("2d");
+function resizeLevelCanvas(){levelCanvas.width=window.innerWidth; levelCanvas.height=window.innerHeight;}
+resizeLevelCanvas(); window.onresize=resizeLevelCanvas;
+let lstars=[];
+function createLevelStars(count){lstars=[];for(let i=0;i<count;i++){lstars.push({x:Math.random()*levelCanvas.width,y:Math.random()*levelCanvas.height,r:Math.random()*2+0.5,o:Math.random(),d:Math.random()*0.03+0.01});}}
+createLevelStars(300);
+function drawLevelStars(){lctx.clearRect(0,0,levelCanvas.width,levelCanvas.height);lstars.forEach(s=>{lctx.globalAlpha=s.o;lctx.shadowBlur=12;lctx.shadowColor="white";lctx.fillStyle="white";lctx.beginPath();lctx.arc(s.x,s.y,s.r,0,2*Math.PI);lctx.fill();s.o+=s.d;if(s.o>1||s.o<0){s.d*=-1;}});lctx.shadowBlur=0;requestAnimationFrame(drawLevelStars);}
+drawLevelStars();
+
+/* فتح ليفل */
+function openLevel(levelIndex,planetIndex){
+  activeLevel=levels[levelIndex];
+  activePlanetIndex=planetIndex;
+  activeQ=0;
+  levelScore=0;
+  home.style.display="none";
+  levelView.style.display="flex";
+  levelCanvas.style.background=activeLevel.bgColor;
+  starsDiv.innerHTML="";
+  createStarForQuestion(activeQ);
+}
+
+/* إنشاء نجمة سؤال */
+function createStarForQuestion(i){
+  const cx=window.innerWidth/2,cy=window.innerHeight/2,r=200;
+  const angle=i/activeLevel.questions.length*2*Math.PI;
+  const x=cx+Math.cos(angle)*r-50,y=cy+Math.sin(angle)*r-50;
+  const star=document.createElement("div");
+  star.className="star-question";
+  star.style.left=x+"px"; star.style.top=y+"px";
+  star.style.opacity=1;
+  star.onclick=()=>openQ(i);
+  starsDiv.appendChild(star);
+}
+
+/* فتح السؤال */
+function openQ(i){
+  activeQ=i;
+  qText.innerText=activeLevel.questions[i].q;
+  optionsDiv.innerHTML="";
+  activeLevel.questions[i].options.forEach(opt=>{
+    let btn=document.createElement("button");
+    btn.className="option-btn";
+    btn.innerText=opt;
+    btn.onclick=()=>submitAnswer(opt);
+    optionsDiv.appendChild(btn);
+  });
+  qPopup.style.display="block";
+}
+function closeQ(){qPopup.style.display="none";}
+
+/* بعد الإجابة */
+function submitAnswer(selected){
+  const correct=activeLevel.questions[activeQ].a;
+  const note=activeLevel.questions[activeQ].note;
+  qPopup.style.display="none";
+  if(selected===correct){
+    totalScore++;
+    levelScore++;
+    infoTitle.innerText="✅ Correct";
+    infoBody.innerText="Well done!\n"+note;
+  } else {
+    infoTitle.innerText="❌ Wrong";
+    infoBody.innerText="Correct answer: "+correct+"\n"+note;
+  }
+  infoPopup.style.display="block";
+}
+
+function closeInfo(){
+  infoPopup.style.display="none";
+  if(activeQ+1<activeLevel.questions.length){
+    activeQ++;
+    createStarForQuestion(activeQ);
+  } else {
+    // عرض سكور الليفل بعد آخر سؤال
+    document.getElementById("levelScoreText").innerText = 
+      `Your score in ${activeLevel.name}: ${levelScore} / ${activeLevel.questions.length}`;
+    document.getElementById("levelScorePopup").style.display = "block";
+  }
+}
+
+function closeLevelScore(){
+  document.getElementById("levelScorePopup").style.display="none";
+  levelView.style.display="none";
+  home.style.display="flex";
+  levelScore=0;
+  if(activePlanetIndex===unlocked && unlocked<planets.length-1){
+    unlocked++;
+    orbitSystem.querySelectorAll(".planet")[unlocked].classList.remove("locked");
+  } else if(activePlanetIndex===planets.length-1){
+    showCongrats();
+  }
+}
+
+/* Congrats */
+function showCongrats(){
+  document.getElementById("finalScore").innerText=`Your total score: ${totalScore}`;
+  document.getElementById("congratsPopup").style.display="block";
+  launchConfetti();
+}
+function closeCongrats(){
+  document.getElementById("congratsPopup").style.display="none";
+}
+</script>
+</body>
+</html>

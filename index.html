@@ -32,7 +32,7 @@ canvas.star-bg {position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
 .btn-primary{background:#0af;color:#000}
 .btn-ghost{background:transparent;border:1px solid #555;color:#fff}
 
-/* Congrats Popup */
+/* Congrats Popup (final) */
 #congratsPopup {
   display: none;
   width: 600px;
@@ -75,7 +75,7 @@ canvas.star-bg {position:absolute;top:0;left:0;width:100%;height:100%;z-index:1}
   to { transform: translateY(100vh) rotate(720deg); }
 }
 
-/* Level Score Popup */
+/* Level Score Popup (small, shown after finishing level) */
 #levelScorePopup {
   background: #111;
   padding: 20px;
@@ -168,9 +168,9 @@ planets.forEach((p,i)=>{
   orbitSystem.appendChild(planet);
 });
 
-/* Confetti */
+/* Confetti (more pieces for final celebration) */
 function launchConfetti(){
-  for(let i=0;i<120;i++){
+  for(let i=0;i<120;i++){ // more confetti pieces
     const confetti=document.createElement("div");
     confetti.className="confetti";
     confetti.style.left=Math.random()*100+"vw";
@@ -184,28 +184,75 @@ function launchConfetti(){
   }
 }
 
-/* الأسئلة */
+/* الـ 53 سؤال (Easy 18, Medium 18, Hard 17) -- نص الأسئلة اللي اديتني ياها */
 const allQuestions=[
-  {q:"When will the global hackathon be held?", a:"4 - 5 October", note:"(4 - 5 October)", options:["3 - 4 October","4 - 5 October","5 - 6 October","6 - 7 October"]},
-  {q:"Does the hackathon require technical background?", a:"no", note:"(can join team with tech background)", options:["yes","no","maybe","depends"]},
-  {q:"What's the difference between virtual and on-site?", a:"there's no difference", note:"(ordinary stuff)", options:["virtual is easier","on-site better","there's no difference","on-site is harder"]},
-  {q:"Can I have a one-man team?", a:"yes", note:"(advised to join team)", options:["yes","no","maybe","depends"]},
-  {q:"How many challenges for 2025?", a:"18 challenges", note:"(18 challenges)", options:["10 challenges","15 challenges","18 challenges","20 challenges"]},
-  {q:"Are judging criteria public?", a:"yes", note:"(link participants guide)", options:["yes","no","not sure","internal only"]},
-  {q:"Where find challenge details?", a:"on NASA space apps website", note:"(link provided)", options:["on NASA space apps website","hackathon app","email","not available"]},
-  {q:"How ask mentor's help?", a:"using discord", note:"(temp answer)", options:["via email","using discord","call mentor","not possible"]},
-  {q:"Is there a deadline?", a:"yes", note:"(to be announced)", options:["no","yes","maybe","team leaders only"]},
-  {q:"Any rules for presentation?", a:"yes", note:"(based on judging)", options:["yes","no","maybe","depends"]},
-  {q:"Is there a closing ceremony?", a:"yes", note:"(date by team)", options:["yes","no","maybe","not decided"]},
-  {q:"Maximum team members?", a:"6 members", note:"(6 members)", options:["4 members","5 members","6 members","7 members"]}
-];
+  /* Easy (18) */
+  {q:"What if I don't have a team yet?", options:["You must find a team before registration closes","You can join existing teams through the platform or find teammates at the bootcamp","You'll be automatically assigned to a random team","You cannot participate without a pre-formed team"], a:"You can join existing teams through the platform or find teammates at the bootcamp", note:"We'll provide team formation activities during the bootcamp to help you connect with other participants who share your interests and skills."},
+  {q:"Can my team include people from different countries?", options:["No, teams must be from the same country only","Yes, but all team members must register for the same local event or Universal Event","Yes, with no restrictions on location","Only if you get special permission from organizers"], a:"Yes, but all team members must register for the same local event or Universal Event", note:"This ensures fair judging within the same event category while allowing international collaboration."},
+  {q:"What programming languages or tools are required?", options:["Only Python and JavaScript are allowed","You must use NASA-approved tools only","There are no specific requirements - use whatever tools work best for your solution","Only open-source tools are permitted"], a:"There are no specific requirements - use whatever tools work best for your solution", note:"Teams have complete flexibility to choose the best tools for their specific challenge and solution approach."},
+  {q:"Where can I learn about using NASA data?", options:["Only through expensive online courses","Through Virtual Bootcamp (Signal 101) videos and NASA's open data portal","You must contact NASA directly","Only experienced programmers can access NASA data"], a:"Through Virtual Bootcamp (Signal 101) videos and NASA's open data portal", note:"We'll provide direct links and guidance during our bootcamp to make NASA data accessible to everyone."},
+  {q:"Is there an age limit?", options:["Must be 18 or older","Must be between 16-30 years old","No age limit, but participants under 18 need parent/guardian registration and supervision","Only university students can participate"], a:"No age limit, but participants under 18 need parent/guardian registration and supervision", note:"NASA Space Apps welcomes all ages, fostering intergenerational collaboration while ensuring proper supervision for minors."},
+  {q:"Should I prepare anything specific before the hackathon?", options:["Just bring your laptop","Review challenges, form/join a team, watch Virtual Bootcamp videos, and attend our bootcamp","Only technical people need to prepare","No preparation needed, everything will be explained on-site"], a:"Review challenges, form/join a team, watch Virtual Bootcamp videos, and attend our bootcamp", note:"Proper preparation significantly increases your chances of success and makes the experience more enjoyable."},
+  {q:"Will there be internet and power at the venue?", options:["Bring your own power bank and mobile data","Limited Wi-Fi for VIP participants only","Yes, full technical support will be provided","Only basic facilities available"], a:"Yes, full technical support will be provided", note:"We ensure high-speed internet, sufficient power outlets, and technical support throughout the 48-hour event."},
+  {q:"Can I bring my own equipment?", options:["No, you must use venue-provided computers","Yes, bring your laptop and any tools you prefer to work with","Only tablets and phones allowed","Equipment will be rented at additional cost"], a:"Yes, bring your laptop and any tools you prefer to work with", note:"Personal equipment ensures you're comfortable with your development environment and can work efficiently."},
+  {q:"Will there be food provided?", options:["Participants must bring their own meals","Only coffee and snacks available","Yes, meals and refreshments will be provided throughout the event","Food trucks will be available at participant expense"], a:"Yes, meals and refreshments will be provided throughout the event", note:"Full catering ensures participants can focus entirely on their projects without worrying about meals."},
+  {q:"Will I receive a certificate?", options:["Only winners get certificates","You must pay extra for certificates","Yes, all participants who submit a project receive a participation certificate","Certificates are only for teams with technical solutions"], a:"Yes, all participants who submit a project receive a participation certificate", note:"Every participant who submits a project demonstrates commitment and learning, deserving recognition."},
+  {q:"What is the maximum team size allowed?", options:["4 members","6 members","8 members","No limit"], a:"6 members", note:"Teams can have 1-6 members, but we recommend forming teams of 3-5 for optimal collaboration and diverse skills."},
+  {q:"Can I participate virtually if I can't attend in person?", options:["No, all participants must be on-site","Yes, virtual participation is available","Only for technical participants","Only with special permission"], a:"Yes, virtual participation is available", note:"NASA Space Apps offers both on-site and virtual participation options to accommodate different needs and circumstances."},
+  {q:"Is there a registration fee?", options:["Yes, $50 per person","Yes, but only for non-students","No, participation is completely free","Fee varies by location"], a:"No, participation is completely free", note:"NASA Space Apps Challenge is free to participate in globally, making it accessible to everyone regardless of financial background."},
+  {q:"Can I use open-source libraries and frameworks?", options:["No, everything must be built from scratch","Yes, open-source resources are encouraged","Only NASA-approved libraries","Only with proper licensing documentation"], a:"Yes, open-source resources are encouraged", note:"Open-source tools, libraries, and frameworks are encouraged to help you build better solutions faster."},
+  {q:"Can I submit multiple solutions?", options:["Yes, unlimited submissions allowed","No, only one solution per team","Maximum of three solutions","One solution per team member"], a:"No, only one solution per team", note:"Each team submits one final solution. Focus your energy on making one great solution rather than multiple average ones."},
+  {q:"What if I don't have programming experience?", options:["You cannot participate","You can contribute through design, business, or storytelling skills","You must take a coding course first","Only observers are allowed"], a:"You can contribute through design, business, or storytelling skills", note:"Successful teams need diverse skills. Non-technical skills like design, business analysis, and storytelling are equally valuable."},
+  {q:"Can I use artificial intelligence tools?", options:["AI tools are completely banned","AI tools are allowed as development aids","Only NASA's AI tools permitted","AI tools only for non-coding tasks"], a:"AI tools are allowed as development aids", note:"AI tools like ChatGPT, GitHub Copilot are allowed as development aids, but your solution should demonstrate your team's creativity and understanding."},
+  {q:"What special satellite is featured in the \"Celebration of Terra Data!\" challenge?", options:["Hubble Space Telescope","Terra satellite celebrating its 25th anniversary","James Webb Space Telescope","International Space Station"], a:"Terra satellite celebrating its 25th anniversary", note:"Terra is NASA's oldest daily Earth-viewing satellite, celebrating 25 years of continuous data collection with over 9,000 days of imagery."},
 
+  /* Medium (18) */
+  {q:"Can we start working on our solution before October 4?", options:["Yes, early preparation gives you an advantage","You can prepare ideas but not start development","No, work should only begin when the hackathon officially starts on October 4 at 9:00 AM","You can start coding one week before"], a:"No, work should only begin when the hackathon officially starts on October 4 at 9:00 AM", note:"This rule ensures fairness for all participants and maintains the true spirit of the hackathon challenge."},
+  {q:"How do I contact organizers during the hackathon?", options:["Email only with 24-hour response time","Through Discord and on-site support team","Text messages to personal phones","Only during scheduled office hours"], a:"Through Discord and on-site support team", note:"Multiple communication channels ensure rapid response for any issues or questions during the event."},
+  {q:"What should I do if I face technical problems?", options:["Ask your teammates to help only","Search online solutions yourself","Contact our technical support team immediately","Wait until the next morning"], a:"Contact our technical support team immediately", note:"Our technical support team is available 24/7 during the hackathon to resolve any issues quickly."},
+  {q:"What are the global judging criteria?", options:["Only technical complexity matters","Impact, Creativity, Validity, Relevance, and Presentation","Just the final presentation quality","Number of NASA datasets used"], a:"Impact, Creativity, Validity, Relevance, and Presentation", note:"Impact (solving real problems), Creativity (innovative approach), Validity (technically sound), Relevance (addresses the challenge), Presentation (clear communication)."},
+  {q:"How long has NASA Space Apps Cairo been running?", options:["Since 2020 - this will be the 5th edition","Since 2015 - this will be the 11th edition in 2025","Since 2010 - this will be the 15th edition","This is the first year for Cairo"], a:"Since 2015 - this will be the 11th edition in 2025", note:"Cairo has built a strong reputation as one of the most successful NASA Space Apps locations globally."},
+  {q:"What was the challenge of TerraTales Team?", options:["Design a Mars rover","Tell us a climate story","Create a space navigation app","Build a satellite communication system"], a:"Tell us a climate story", note:"This storytelling challenge showcased how creative communication can be as impactful as technical solutions."},
+  {q:"What is the duration of the NASA Space Apps hackathon?", options:["24 hours","48 hours","72 hours","One week"], a:"48 hours", note:"The hackathon runs for 48 hours straight, from Saturday morning to Sunday evening, providing intensive development time."},
+  {q:"Which judging criterion focuses on solving real-world problems?", options:["Creativity","Validity","Impact","Presentation"], a:"Impact", note:"Impact measures how well your solution addresses real problems and benefits society, environment, or scientific understanding."},
+  {q:"What does \"Validity\" mean in the judging criteria?", options:["Creative and innovative approach","Technical soundness and feasibility","Relevance to the challenge","Quality of presentation"], a:"Technical soundness and feasibility", note:"Validity assesses whether your solution is technically sound, feasible, and properly implemented."},
+  {q:"How are local winners selected?", options:["Public voting only","Random selection from all submissions","Expert judging panel using global criteria","Organizer decision only"], a:"Expert judging panel using global criteria", note:"Local winners are selected by expert judges using the same criteria as global judging: Impact, Creativity, Validity, Relevance, and Presentation."},
+  {q:"What type of mentorship is available during the hackathon?", options:["Technical mentorship only","Business mentorship only","Both technical and non-technical mentorship","Self-directed mentorship only"], a:"Both technical and non-technical mentorship", note:"Mentors provide guidance on technical implementation, business viability, presentation skills, and project strategy."},
+  {q:"What is the \"Create Your Own Challenge\" option?", options:["Teams can modify existing challenges","Teams can propose completely new challenge topics","Teams can combine multiple challenges","Teams can skip the challenge requirement"], a:"Teams can propose completely new challenge topics", note:"This option allows creative teams to work on innovative ideas that don't fit existing challenges, though it's not eligible for global judging."},
+  {q:"How are teams typically formed?", options:["Random assignment by organizers","University or company groups only","Self-formation through various networking methods","Based on technical skill levels only"], a:"Self-formation through various networking methods", note:"Teams form through bootcamp activities, online platforms, university connections, or meeting at the event itself."},
+  {q:"What is the role of the Solution Quality team?", options:["They judge all projects","They provide technical support and enhance the judging process","They organize venue logistics","They handle registration only"], a:"They provide technical support and enhance the judging process", note:"The Solution Quality team focuses on improving judging standards, providing participant support, and ensuring alignment with global criteria."},
+  {q:"What distinguishes advanced difficulty challenges?", options:["They require PhD-level knowledge","They involve complex technical implementations and domain expertise","They have higher prize money","They require larger teams"], a:"They involve complex technical implementations and domain expertise", note:"Advanced challenges typically require deeper technical skills, specialized knowledge, or complex system integration."},
+  {q:"What is the significance of the Terra satellite in 2025 challenges?", options:["It's featured in multiple challenges celebrating its 25th anniversary","It's being decommissioned","It's launching new instruments","It's changing orbital patterns"], a:"It's featured in multiple challenges celebrating its 25th anniversary", note:"Terra's 25-year milestone is celebrated through challenges that utilize its extensive Earth observation data archive."},
+  {q:"What difficulty levels are available for the 2025 challenges?", options:["Easy, Medium, Hard","Level 1, Level 2, Level 3","Beginner/Youth, Intermediate, Advanced","Basic, Expert, Professional"], a:"Beginner/Youth, Intermediate, Advanced", note:"Challenges are categorized to accommodate participants with different skill levels, from beginners to advanced practitioners."},
+  {q:"Which challenge allows teams to propose their own ideas?", options:["Build Your Own Solution","Create Your Own Challenge","Design Your Project","Open Innovation Challenge"], a:"Create Your Own Challenge", note:"This option allows creative teams to work on innovative ideas outside existing challenges, though it's not eligible for global judging."},
+
+  /* Hard (17) */
+  {q:"What was Cairo's biggest achievement in 2024?", options:["Largest number of participants globally","Team TerraTales became Egypt's first-ever Global Winner, winning the Best Storytelling Award","First city to have 100% online participation","Most technical solutions submitted"], a:"Team TerraTales became Egypt's first-ever Global Winner, winning the Best Storytelling Award", note:"This historic achievement put Cairo on the global map and inspired future participants."},
+  {q:"What makes NASA Space Apps Cairo special globally?", options:["It only accepts technical participants","It has the most expensive prizes","It's consistently ranked among the largest hackathons worldwide in NASA Space Apps Challenge history","It's the only Arabic-speaking location"], a:"It's consistently ranked among the largest hackathons worldwide in NASA Space Apps Challenge history", note:"Cairo's scale, success rate, and community engagement make it a standout location in the global network."},
+  {q:"Can you describe TerraTales' success approach?", options:["They used only advanced AI programming","They focused purely on technical complexity","They won by creating climate stories for Egypt, Brazil, and Germany with AI forecasting","They built the most expensive prototype"], a:"They won by creating climate stories for Egypt, Brazil, and Germany with AI forecasting", note:"Their success came from combining technical skills (AI) with powerful storytelling and real-world relevance."},
+  {q:"How many global nominees has Cairo produced recently?", options:["3 teams in 2024, same as previous years","10 teams in 2024, significantly up from 3 in previous years","Only 1 team consistently each year","15 teams every year since 2020"], a:"10 teams in 2024, significantly up from 3 in previous years", note:"This dramatic improvement shows Cairo's growing expertise in preparing teams for global-level competition."},
+  {q:"Which challenge specifically uses artificial intelligence for space exploration?", options:["Build a Space Biology Knowledge Engine","A World Away: Hunting for Exoplanets with AI","From EarthData to Action","Deep Dive: Immersive Data Stories"], a:"A World Away: Hunting for Exoplanets with AI", note:"This advanced challenge requires creating AI/ML models to automatically analyze exoplanet survey data and identify new planets."},
+  {q:"What does the \"Sharks from Space\" challenge focus on?", options:["Satellite tracking of marine life","Creating a mathematical framework for identifying sharks using NASA satellite data","Ocean temperature monitoring","Underwater photography from space"], a:"Creating a mathematical framework for identifying sharks using NASA satellite data", note:"This advanced challenge involves using satellite data to track top predators and predict their foraging habitats in real-time."},
+  {q:"Which challenge addresses waste management on Mars?", options:["Space Sustainability Project","Mars Colonization Planning","SpaceTrash Hack: Revolutionizing Recycling on Mars","Red Planet Resources"], a:"SpaceTrash Hack: Revolutionizing Recycling on Mars", note:"This challenge focuses on designing sustainable systems to manage, reuse, or recycle inorganic waste during Mars missions."},
+  {q:"What is the focus of the \"Stellar Stories\" challenge?", options:["Creating science fiction narratives","Writing digital children's stories about space weather","Documenting astronaut experiences","Designing space-themed animations"], a:"Writing digital children's stories about space weather", note:"Teams create educational digital stories explaining space weather's impact on different people like farmers, pilots, and astronauts."},
+  {q:"Which challenge involves creating VR experiences?", options:["Virtual Space Exploration","Deep Dive: Immersive Data Stories from Ocean to Sky","3D Space Visualization","Interactive Earth Science"], a:"Deep Dive: Immersive Data Stories from Ocean to Sky", note:"This challenge requires building immersive VR experiences using NASA's Earth observation datasets to tell ocean stories."},
+  {q:"What specific technical requirement distinguishes the \"Through the Radar Looking Glass\" challenge?", options:["Using optical satellite imagery","Working with synthetic aperture radar (SAR) data with multi-frequency or multi-polarization","Processing thermal imaging data","Analyzing GPS tracking information"], a:"Working with synthetic aperture radar (SAR) data with multi-frequency or multi-polarization", note:"This advanced challenge requires downloading and analyzing complex SAR data to develop hypotheses about Earth's physical processes."},
+  {q:"Which challenge specifically targets the commercialization of Low Earth Orbit?", options:["Space Business Development","Orbital Commerce Solutions","Commercializing Low Earth Orbit (LEO)","Space Economy Planning"], a:"Commercializing Low Earth Orbit (LEO)", note:"This intermediate-to-advanced challenge requires designing scalable, sustainable business models for LEO operations while addressing regulatory and environmental complexities."},
+  {q:"What makes the \"Embiggen Your Eyes!\" challenge technically demanding?", options:["It requires advanced AI algorithms","It involves creating platforms for massive image datasets with billions or trillions of pixels","It needs specialized hardware","It requires real-time data processing"], a:"It involves creating platforms for massive image datasets with billions or trillions of pixels", note:"This challenge involves handling NASA's enormous space images that exceed typical display capabilities, requiring sophisticated zoom and labeling platforms."},
+  {q:"Which challenge combines space biology with artificial intelligence?", options:["Bio-AI Space Research","Build a Space Biology Knowledge Engine","Space Medicine AI System","Biological Data Mining"], a:"Build a Space Biology Knowledge Engine", note:"This challenge requires building AI-powered dashboards and knowledge graphs to summarize NASA's decades of space biology experiment publications."},
+  {q:"What specific technical focus does the \"International Space Station 25th Anniversary Apps\" challenge have?", options:["Orbital mechanics simulation","Creating visual tools for cupola experiences and Neutral Buoyancy Laboratory training","Life support system design","Communication system development"], a:"Creating visual tools for cupola experiences and Neutral Buoyancy Laboratory training", note:"This challenge focuses on unique ISS experiences - the breathtaking Earth views from the cupola and weightlessness training in the NBL facility."},
+  {q:"Which subjects are covered in the 2025 challenges?", options:["Only technical and programming subjects","Animation, Data Science, Earth Science, AI, Business, and more","Only space-related subjects","Only environmental and climate subjects"], a:"Animation, Data Science, Earth Science, AI, Business, and more", note:"The 2025 challenges span diverse subjects including Animation, Arts, AI, Data Science, Earth Science, Business Economics, and many others."},
+  {q:"What new technology focus appears prominently in multiple 2025 challenges?", options:["Blockchain technology","Artificial Intelligence and Machine Learning","Quantum computing","Augmented Reality only"], a:"Artificial Intelligence and Machine Learning", note:"AI/ML features in several challenges including exoplanet detection, space biology knowledge engines, and air quality forecasting."},
+  {q:"Which challenge specifically addresses climate and environmental storytelling?", options:["Environmental Data Analysis","Tell us a climate story (similar to TerraTales' winning challenge)","Climate Change Solutions","Environmental Monitoring Systems"], a:"Tell us a climate story (similar to TerraTales' winning challenge)", note:"This type of storytelling challenge, similar to what TerraTales won with, emphasizes creative communication of climate data and impacts."}
+]; /* end allQuestions (53 total) */
+
+/* توزيع الأسئلة على 5 ليفلات (11,11,17,7,7) */
 const levels=[
-  {name:"Mercury",bgColor:"#2e2e2e",questions:allQuestions.slice(0,3)},
-  {name:"Mars",bgColor:"#4d0000",questions:allQuestions.slice(3,5)},
-  {name:"Saturn",bgColor:"#4d3300",questions:allQuestions.slice(5,7)},
-  {name:"Uranus",bgColor:"#00334d",questions:allQuestions.slice(7,9)},
-  {name:"Neptune",bgColor:"#00004d",questions:allQuestions.slice(9,12)}
+  {name:"Mercury",bgColor:"#2e2e2e",questions: allQuestions.slice(0,11)},
+  {name:"Mars",bgColor:"#4d0000",questions: allQuestions.slice(11,22)},
+  {name:"Saturn",bgColor:"#4d3300",questions: allQuestions.slice(22,39)},
+  {name:"Uranus",bgColor:"#00334d",questions: allQuestions.slice(39,46)},
+  {name:"Neptune",bgColor:"#00004d",questions: allQuestions.slice(46,53)}
 ];
 
 let activeLevel,activePlanetIndex,activeQ;
@@ -217,8 +264,9 @@ const levelView=document.getElementById("levelView");
 const starsDiv=document.getElementById("stars");
 const qPopup=document.getElementById("qPopup"),qText=document.getElementById("qText"),optionsDiv=document.getElementById("options");
 const infoPopup=document.getElementById("infoPopup"),infoTitle=document.getElementById("infoTitle"),infoBody=document.getElementById("infoBody");
+const scorePopup=document.getElementById("congratsPopup"),scoreText=document.getElementById("finalScore");
 
-/* نجوم الصفحة الرئيسية */
+/* نجوم الصفحة الرئيسية (animated) */
 const homeCanvas=document.getElementById("homeCanvas");
 const hctx=homeCanvas.getContext("2d");
 function resizeHomeCanvas(){homeCanvas.width=window.innerWidth; homeCanvas.height=window.innerHeight;}
@@ -253,7 +301,7 @@ function openLevel(levelIndex,planetIndex){
   createStarForQuestion(activeQ);
 }
 
-/* إنشاء نجمة سؤال */
+/* إنشاء نجمة سؤال (نرى نجمة واحدة في البداية، والباقي يفتح بعد الإجابة) */
 function createStarForQuestion(i){
   const cx=window.innerWidth/2,cy=window.innerHeight/2,r=200;
   const angle=i/activeLevel.questions.length*2*Math.PI;
@@ -303,12 +351,12 @@ function closeInfo(){
   infoPopup.style.display="none";
   if(activeQ+1<activeLevel.questions.length){
     activeQ++;
-    createStarForQuestion(activeQ);
+    createStarForQuestion(activeQ); // show next star only after answering previous
   } else {
-    // عرض سكور الليفل بعد آخر سؤال
-    document.getElementById("levelScoreText").innerText = 
+    // show per-level score popup (small) instead of immediately returning to home
+    document.getElementById("levelScoreText").innerText =
       `Your score in ${activeLevel.name}: ${levelScore} / ${activeLevel.questions.length}`;
-    document.getElementById("levelScorePopup").style.display = "block";
+    document.getElementById("levelScorePopup").style.display="block";
   }
 }
 
@@ -325,9 +373,9 @@ function closeLevelScore(){
   }
 }
 
-/* Congrats */
+/* Congrats final */
 function showCongrats(){
-  document.getElementById("finalScore").innerText=`Your total score: ${totalScore}`;
+  document.getElementById("finalScore").innerText = "Your total score: " + totalScore + " / 53";
   document.getElementById("congratsPopup").style.display="block";
   launchConfetti();
 }
